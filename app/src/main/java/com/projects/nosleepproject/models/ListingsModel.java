@@ -14,9 +14,19 @@ public class ListingsModel {
 
     public class Data{
         private List<Children> children;
+        private String after;
+        private String before;
 
         public List<Children> getChildren() {
             return children;
+        }
+
+        public String getAfter() {
+            return after;
+        }
+
+        public String getBefore() {
+            return before;
         }
     }
 
@@ -29,10 +39,12 @@ public class ListingsModel {
     }
 
     public class ChildrenData{
-        private String selftext_html;
         private String url;
         private String author;
+        private String title;
         private int score;
+        private String id;
+        private String selftext_html;
 
         public String getSelftext_html() {
             return selftext_html;
@@ -44,6 +56,14 @@ public class ListingsModel {
 
         public String getAuthor() {
             return author;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public int getScore() {
