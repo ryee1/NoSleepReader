@@ -1,16 +1,23 @@
 package com.projects.nosleepproject;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class ReaderActivity extends AppCompatActivity {
 
+    public static String READER_URL_KEY = "url_key";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
+        Intent intent = getIntent();
+        String url = intent.getStringExtra(READER_URL_KEY);
+        ReaderFragment readerFragment = ReaderFragment.getInstance(url);
+        getSupportFragmentManager().beginTransaction().replace(R.id.reader_fragment_container,
+                readerFragment).commit();
     }
 
     @Override

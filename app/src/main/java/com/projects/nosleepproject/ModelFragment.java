@@ -24,7 +24,7 @@ public class ModelFragment extends Fragment {
 
     private ApiService service;
     private ListingDbHelper mDbHelper;
-    public static String BASE_URL = "http://www.reddit.com/r/nosleep/";
+    public static String MFRAG_BASE_URL = "http://www.reddit.com/r/nosleep/";
 
     public boolean tableOneLoaded;
 
@@ -42,29 +42,28 @@ public class ModelFragment extends Fragment {
         mDbHelper = ListingDbHelper.getInstance(getActivity());
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(MFRAG_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(ApiService.class);
-        getListings("timestamp:338166428..1348009628", "", contentArray, 500);
+        getListings("timestamp:338166428..1348009628", "t3_vqwzn", contentArray, 500);
     }
 
-    private void getListings(final String timestamp, String after,
-                             final List<ContentValues> contentArray, final int minVotes){
-//        Call<ListingsModel> call =  service.search(service.TOP, service.SYNTAX, timestamp,
-//                service.RESTRICT_SR, service.LIMIT);
-        Call<ListingsModel> call =  service.search(service.TOP, service.RAW_JSON,
+    private void getListings(final String timestamp, final String after,
+                             final List<ContentValues> contentArray, final int minVotes) {
+
+        Call<ListingsModel> call = service.searchBulk(service.TOP, service.RAW_JSON,
                 service.RESTRICT_SR, service.LIMIT, timestamp, service.SYNTAX, after);
         call.enqueue(new Callback<ListingsModel>() {
 
             @Override
             public void onResponse(Response<ListingsModel> response) {
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                String after = response.body().getData().getAfter();
-                int submissionsCount = response.body().getData().getChildren().size();
-                int voteThreshold = response.body().getData().getChildren()
-                        .get(submissionsCount - 1).getChildrenData().getScore();
                 try {
+                    String after = response.body().getData().getAfter();
+                    int submissionsCount = response.body().getData().getChildren().size();
+                    int voteThreshold = response.body().getData().getChildren()
+                            .get(submissionsCount - 1).getChildrenData().getScore();
                     if (after != null && voteThreshold > minVotes) {
                         Log.e("after: ", after);
                         mDbHelper.insertTable(response.body(), contentArray);
@@ -73,8 +72,8 @@ public class ModelFragment extends Fragment {
                         mDbHelper.insertTable(response.body(), contentArray);
                         tableOneLoaded = true;
                     }
-                }catch(Exception e){
-                    Log.e("getListings error: ", e.getMessage());
+                } catch (Exception e) {
+                    Log.e("getListings error: ", after);
                 }
             }
 

@@ -1,19 +1,23 @@
 package com.projects.nosleepproject;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.projects.nosleepproject.data.ListingDbHelper;
 import com.projects.nosleepproject.events.ListingLoadedEvent;
 
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     private ModelFragment mFrag;
     private ListView mListView;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         if(!firstRun){
             mAdapter = new ListViewAdapter(this, mValuesArray);
             mListView.setAdapter(mAdapter);
+            mListView.setOnItemClickListener(this);
             firstRun = true;
         }
         else {
@@ -77,5 +82,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String url = mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL);
+        Intent intent = new Intent(this, ReaderActivity.class);
+        intent.putExtra(ReaderActivity.READER_URL_KEY, url);
+        startActivity(intent);
     }
 }
