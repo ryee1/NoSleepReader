@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if(mFrag == null){
             getSupportFragmentManager().beginTransaction().add(new ModelFragment(), MFRAG_TAG).commit();
         }
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int id = menuItem.getItemId();
 
                 switch(id){
-                    
+
                 }
 
                 return true;
