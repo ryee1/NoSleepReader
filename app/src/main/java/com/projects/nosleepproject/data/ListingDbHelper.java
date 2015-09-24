@@ -102,7 +102,8 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                     valuesArray.add(values);
                     db.insertWithOnConflict(TABLE_NAME_YEAR_ONE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 }
-                EventBus.getDefault().postSticky(new ListingLoadedEvent(valuesArray));
+                String after = listingsModel.getData().getAfter();
+                EventBus.getDefault().postSticky(new ListingLoadedEvent(valuesArray, after));
                 db.setTransactionSuccessful();
             } catch(Exception e){
                 Log.e("Error Loading db: ", valuesArray.get(0).getAsString(COLUMN_TITLE));

@@ -9,9 +9,15 @@ import java.util.List;
  */
 public class ListingLoadedEvent {
     private List<ContentValues> values;
+    private String after;
 
-    public ListingLoadedEvent(List<ContentValues> values) {
+    public ListingLoadedEvent(List<ContentValues> values, String after) {
         this.values = values;
+        this.after = after;
+    }
+
+    public String getAfter() {
+        return after;
     }
 
     public List<ContentValues> getValues() {

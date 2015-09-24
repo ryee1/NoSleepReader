@@ -52,14 +52,21 @@ public class ListViewAdapter extends BaseAdapter {
             holder = new ViewHolder(row);
         }
         holder.title.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_TITLE));
+        holder.score.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_SCORE));
+        holder.author.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_AUTHOR));
+
         return row;
     }
 
     private class ViewHolder{
         public TextView title;
+        public TextView score;
+        public TextView author;
 
         public ViewHolder(View view){
             title = (TextView) view.findViewById(R.id.submission_title);
+            score = (TextView) view.findViewById(R.id.score);
+            author = (TextView) view.findViewById(R.id.author);
         }
     }
 }

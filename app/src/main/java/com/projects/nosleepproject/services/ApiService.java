@@ -17,12 +17,12 @@ public interface ApiService {
     public static String SYNTAX = "cloudsearch";
     public static String RESTRICT_SR = "ON";
     public static int RAW_JSON = 1;
-    public static int LIMIT = 100;
 
     @GET("search.json")
     Call<ListingsModel> searchBulk(@Query("sort") String TOP, @Query("raw_json") int RAW_JSON,
-                                   @Query("restrict_sr") String RESTRICT_SR, @Query("limit") int LIMIT,
-                                   @Query("q") String q, @Query("syntax") String SYNTAX, @Query("after") String after);
+                                   @Query("restrict_sr") String RESTRICT_SR, @Query("limit") int limit,
+                                   @Query("q") String q, @Query("syntax") String SYNTAX, @Query("after")
+                                   String after, @Query("count") int count);
 
     @GET(".json")
     Call<DetailModel[]> getText(@Query("raw_json") int RAW_JSON);
