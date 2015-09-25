@@ -20,11 +20,12 @@ import android.widget.ProgressBar;
 import com.projects.nosleepproject.data.ListingDbHelper;
 import com.projects.nosleepproject.events.ListingLoadedEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
 
     private ModelFragment mFrag;
     private ListView mListView;
@@ -34,18 +35,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
 
+    private String mCurrentTable;
+
     private int count = 0;
-    private boolean firstRun;
+    private boolean firstRun = true;
     private static String MFRAG_TAG = "mfrag";
 
     public ProgressBar loadingPanel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(mFrag == null){
+        if (mFrag == null) {
             getSupportFragmentManager().beginTransaction().add(new ModelFragment(), MFRAG_TAG).commit();
+            getSupportFragmentManager().executePendingTransactions();
+
+            mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
         }
 
         loadingPanel = (ProgressBar) findViewById(R.id.loading_panel);
@@ -61,14 +68,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setupDrawerContent(nView);
     }
 
-    public void setupDrawerContent(NavigationView nView){
+    public void setupDrawerContent(NavigationView nView) {
         nView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 int id = menuItem.getItemId();
 
-                switch(id){
-
+                switch (id) {
+                    case R.id.nav_year_one:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_ONE;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_ONE, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_ONE);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.nav_year_two:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_TWO;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_TWO, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_TWO);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.nav_year_three:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_THREE;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_THREE, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_THREE);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.nav_year_four:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_FOUR;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_FOUR, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_FOUR);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.nav_year_five:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_FIVE;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_FIVE, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_FIVE);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.nav_year_six:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_SIX;
+                        mFrag.getListings(ListingDbHelper.UNIX_YEAR_SIX, "", mValuesArray, count,
+                                ListingDbHelper.TABLE_NAME_YEAR_SIX);
+                        mDrawer.closeDrawers();
+                        break;
                 }
 
                 return true;
@@ -76,6 +124,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    public void resetList() {
+        mValuesArray = new ArrayList<>();
+        firstRun = true;
+        count = 0;
+        loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    public void getCurrentList(){
+        String timestamp = null;
+        String table = null;
+        switch(mCurrentTable){
+            case ListingDbHelper.TABLE_NAME_YEAR_ONE:
+                table = ListingDbHelper.TABLE_NAME_YEAR_ONE;
+                timestamp = ListingDbHelper.UNIX_YEAR_ONE;
+                break;
+            case ListingDbHelper.TABLE_NAME_YEAR_TWO:
+                table = ListingDbHelper.TABLE_NAME_YEAR_TWO;
+                timestamp = ListingDbHelper.UNIX_YEAR_TWO;
+                break;
+            case ListingDbHelper.TABLE_NAME_YEAR_THREE:
+                table = ListingDbHelper.TABLE_NAME_YEAR_THREE;
+                timestamp = ListingDbHelper.UNIX_YEAR_THREE;
+                break;
+            case ListingDbHelper.TABLE_NAME_YEAR_FOUR:
+                table = ListingDbHelper.TABLE_NAME_YEAR_FOUR;
+                timestamp = ListingDbHelper.UNIX_YEAR_FOUR;
+                break;
+            case ListingDbHelper.TABLE_NAME_YEAR_FIVE:
+                table = ListingDbHelper.TABLE_NAME_YEAR_FIVE;
+                timestamp = ListingDbHelper.UNIX_YEAR_FIVE;
+                break;
+            case ListingDbHelper.TABLE_NAME_YEAR_SIX:
+                table = ListingDbHelper.TABLE_NAME_YEAR_SIX;
+                timestamp = ListingDbHelper.UNIX_YEAR_SIX;
+                break;
+        }
+        mFrag.getListings(timestamp, mAfter, mValuesArray, count, table);
+    }
     @Override
     protected void onPause() {
         EventBus.getDefault().unregister(this);
@@ -88,23 +174,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EventBus.getDefault().registerSticky(this);
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     @SuppressWarnings("unused")
-    public void onEventMainThread(ListingLoadedEvent event){
+    public void onEventMainThread(ListingLoadedEvent event) {
+        if(mFrag.scrollLoading)
+            return;
         mValuesArray = event.getValues();
         mAfter = event.getAfter();
-        if(!firstRun){
+        if (firstRun) {
             mAdapter = new ListViewAdapter(this, mValuesArray);
             mListView.setAdapter(mAdapter);
+            count = 0;
             mListView.setOnItemClickListener(this);
             mListView.setOnScrollListener(this);
             loadingPanel.setVisibility(View.GONE);
-            firstRun = true;
-        }
-        else {
+            firstRun = false;
+        } else {
             mAdapter.notifyDataSetChanged();
             loadingPanel.setVisibility(View.GONE);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -142,8 +241,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent intent = new Intent(this, ReaderActivity.class);
             intent.putExtra(ReaderActivity.READER_URL_KEY, url);
             startActivity(intent);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Log.e("MainActivity: ", "OnItemClick out of bound");
         }
     }
@@ -156,15 +254,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount
             , int totalItemCount) {
-        mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
 
         int lastInScreen = firstVisibleItem + visibleItemCount;
         Log.e("After: ", mAfter);
-        if(lastInScreen == totalItemCount && !mFrag.scrollLoading){
+        if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
             loadingPanel.setVisibility(View.VISIBLE);
             count += 30;
             Log.e("count: ", Integer.toString(count));
-            mFrag.getListings("timestamp:338166428..1348009628", mAfter, mValuesArray, count);
+            getCurrentList();
+        }
+        //Added to fix progressbar showing when end of list is reached
+        if(!mFrag.scrollLoading){
+            loadingPanel.setVisibility(View.GONE);
         }
     }
 }

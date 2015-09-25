@@ -18,9 +18,10 @@ public interface ApiService {
     public static String RESTRICT_SR = "ON";
     public static int RAW_JSON = 1;
 
+    //etc: http://www.reddit.com/r/nosleep/search.json?sort=top&raw_json=1&restrict_sr=ON&limit=30&q=timestamp:1293840000..1293926399&syntax=cloudsearch&after=&count=0
     @GET("search.json")
     Call<ListingsModel> searchBulk(@Query("sort") String TOP, @Query("raw_json") int RAW_JSON,
-                                   @Query("restrict_sr") String RESTRICT_SR, @Query("limit") int limit,
+                                   @Query("restrict_sr") String RESTRICT_SR,
                                    @Query("q") String q, @Query("syntax") String SYNTAX, @Query("after")
                                    String after, @Query("count") int count);
 

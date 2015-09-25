@@ -2,7 +2,6 @@ package com.projects.nosleepproject;
 
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -46,24 +45,23 @@ public class ModelFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(ApiService.class);
-        getListings("timestamp:338166428..1348009628", "", contentArray, 0);
+      //  getListings("timestamp:338166428..1348009628", "", contentArray, 0);
     }
 
     public void getListings(final String timestamp, final String after,
-                             final List<ContentValues> contentArray, int count) {
+                             final List<ContentValues> contentArray, int count, final String table) {
         scrollLoading = true;
         Call<ListingsModel> call = service.searchBulk(service.TOP, service.RAW_JSON,
-                service.RESTRICT_SR, 30, timestamp, service.SYNTAX, after, count);
+                service.RESTRICT_SR, timestamp, service.SYNTAX, after, count);
         call.enqueue(new Callback<ListingsModel>() {
-
             @Override
             public void onResponse(Response<ListingsModel> response) {
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 try {
                     String after = response.body().getData().getAfter();
+
+                    Log.e("ModelFragment: ", after);
                     if(after != null) {
-                        Log.e("Model After: ", after);
-                        mDbHelper.insertTable(response.body(), contentArray, ListingDbHelper.TABLE_NAME_YEAR_ONE);
+                        mDbHelper.insertTable(response.body(), contentArray, table);
                     }
 
                 } catch (Exception e) {
@@ -80,5 +78,6 @@ public class ModelFragment extends Fragment {
                 Log.e("getListings: ", "failed to get list");
             }
         });
+        Log.e("Modelfragment before:", table);
     }
 }
