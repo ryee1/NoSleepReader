@@ -23,10 +23,12 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
     private static int DATABASE_VERSION = 1;
     static String DATABASE_NAME = "listing.db";
 
-    public static final String TABLE_NAME_YEAR_ONE = "year_one";
-    public static final String TABLE_NAME_YEAR_TWO = "year_two";
-    public static final String TABLE_NAME_YEAR_THREE = "year_three";
-    public static final String TABLE_NAME_YEAR_FOUR = "year_four";
+    public static final String TABLE_NAME_YEAR_ONE = "year_2010";
+    public static final String TABLE_NAME_YEAR_TWO = "year_2011";
+    public static final String TABLE_NAME_YEAR_THREE = "year_2012";
+    public static final String TABLE_NAME_YEAR_FOUR = "year_2013";
+    public static final String TABLE_NAME_YEAR_FIVE = "year_2014";
+    public static final String TABLE_NAME_YEAR_SIX = "year_2015";
 
     public static final String COLUMN_ID = "r_id";
     public static final String COLUMN_AUTHOR = "author";
@@ -34,6 +36,12 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_URL = "url";
 
+    public static final String UNIX_YEAR_ONE = "timestamp:1262304000..1293839999";
+    public static final String UNIX_YEAR_TWO = "timestamp:1293840000..1293926399";
+    public static final String UNIX_YEAR_THREE = "timestamp:1325376000..1325462399";
+    public static final String UNIX_YEAR_FOUR = "timestamp:1356998400..1357084799";
+    public static final String UNIX_YEAR_FIVE = "timestamp:1388534400..1388620799";
+    public static final String UNIX_YEAR_SIX = "timestamp:1420070400.." + System.currentTimeMillis() / 1000L;
 
     private static ListingDbHelper singleton = null;
     public synchronized static ListingDbHelper getInstance(Context ctxt){
@@ -53,7 +61,7 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
         // CREATE TABLE year one ( _ID INTEGER PRIMARY KEY, author TEXT NOT NULL, title TEXT NOT NULL,
         // score INTEGER NOT NULL, url TEXT NOT NULL );
 
-        final String SQL_CREATE_LIST_TABLE = "CREATE TABLE " + TABLE_NAME_YEAR_ONE + " ( " +
+        final String SQL_CREATE_LIST_TABLE_ONE = "CREATE TABLE " + TABLE_NAME_YEAR_ONE + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_ID + " VARCHAR NOT NULL, " +
                 COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
@@ -61,7 +69,52 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
-        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE);
+        final String SQL_CREATE_LIST_TABLE_TWO = "CREATE TABLE " + TABLE_NAME_YEAR_TWO + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        final String SQL_CREATE_LIST_TABLE_THREE = "CREATE TABLE " + TABLE_NAME_YEAR_THREE + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        final String SQL_CREATE_LIST_TABLE_FOUR = "CREATE TABLE " + TABLE_NAME_YEAR_FOUR + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        final String SQL_CREATE_LIST_TABLE_FIVE = "CREATE TABLE " + TABLE_NAME_YEAR_FIVE + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        final String SQL_CREATE_LIST_TABLE_SIX = "CREATE TABLE " + TABLE_NAME_YEAR_SIX + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_ONE);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_TWO);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_THREE);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_FOUR);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_FIVE);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_SIX);
     }
 
     @Override
@@ -69,17 +122,19 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
         Log.e("onUpgrade: ", "How did I get here");
     }
 
-    public void insertTable(ListingsModel listingsModel, List<ContentValues> valuesArray){
-        new LoadListingEvent(listingsModel, valuesArray).start();
+    public void insertTable(ListingsModel listingsModel, List<ContentValues> valuesArray, String table){
+        new LoadListingEvent(listingsModel, valuesArray, table).start();
     }
 
     private class LoadListingEvent extends Thread{
         private ListingsModel listingsModel;
         private boolean lastPage;
         private List<ContentValues> valuesArray;
-        public LoadListingEvent(ListingsModel listingsModel, List<ContentValues> valuesArray){
+        private String table;
+        public LoadListingEvent(ListingsModel listingsModel, List<ContentValues> valuesArray,
+                                String table){
             this.listingsModel = listingsModel;
-            this.lastPage = lastPage;
+            this.table = table;
             this.valuesArray = valuesArray;
         }
 
@@ -100,7 +155,7 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                     values.put(COLUMN_SCORE, list.get(i).getChildrenData().getScore());
                     values.put(COLUMN_URL, list.get(i).getChildrenData().getUrl());
                     valuesArray.add(values);
-                    db.insertWithOnConflict(TABLE_NAME_YEAR_ONE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                    db.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 }
                 String after = listingsModel.getData().getAfter();
                 EventBus.getDefault().postSticky(new ListingLoadedEvent(valuesArray, after));

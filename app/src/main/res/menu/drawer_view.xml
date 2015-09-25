@@ -1,14 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_first_fragment"
-            android:title="First" />
-        <item
-            android:id="@+id/nav_second_fragment"
-            android:title="Second" />
-        <item
-            android:id="@+id/nav_third_fragment"
-            android:title="Third" />
-    </group>
+    <item android:title="@string/best_of">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_year_one"
+                    android:title="2010" />
+                <item
+                    android:id="@+id/nav_year_two"
+                    android:title="2011" />
+                <item
+                    android:id="@+id/nav_year_three"
+                    android:title="2012" />
+                <item
+                    android:id="@+id/nav_year_four"
+                    android:title="2013" />
+                <item
+                    android:id="@+id/nav_year_five"
+                    android:title="2014" />
+            </group>
+        </menu>
+    </item>
 </menu>

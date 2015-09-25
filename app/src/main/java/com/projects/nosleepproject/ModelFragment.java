@@ -63,7 +63,7 @@ public class ModelFragment extends Fragment {
                     String after = response.body().getData().getAfter();
                     if(after != null) {
                         Log.e("Model After: ", after);
-                        mDbHelper.insertTable(response.body(), contentArray);
+                        mDbHelper.insertTable(response.body(), contentArray, ListingDbHelper.TABLE_NAME_YEAR_ONE);
                     }
 
                 } catch (Exception e) {
