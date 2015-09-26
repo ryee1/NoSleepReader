@@ -23,6 +23,8 @@ public class ModelFragment extends Fragment {
 
     private ApiService service;
     private ListingDbHelper mDbHelper;
+    private List<ContentValues> contentArray;
+
     public static String MFRAG_BASE_URL = "http://www.reddit.com/r/nosleep/";
     public boolean scrollLoading;
     public boolean tableOneLoaded;
@@ -31,13 +33,16 @@ public class ModelFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public List<ContentValues> getContentArray() {
+        return contentArray;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-
-        List<ContentValues> contentArray = new ArrayList<>();
+        contentArray = new ArrayList<>();
         mDbHelper = ListingDbHelper.getInstance(getActivity());
 
         Retrofit retrofit = new Retrofit.Builder()

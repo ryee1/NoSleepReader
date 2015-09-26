@@ -19,7 +19,8 @@
         </activity>
         <activity
             android:name=".ReaderActivity"
-            android:label="@string/title_activity_reader" >
+            android:label="@string/title_activity_reader"
+            android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
     </application>
 

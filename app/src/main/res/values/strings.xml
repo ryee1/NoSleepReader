@@ -10,4 +10,5 @@
     <string name="title_activity_reader">ReaderActivity</string>
     <string name="nav_header_title">NoSleep Reader</string>
     <string name="best_of">Best of</string>
+    <string name="submitted_by">Submitted By:</string>
 </resources>

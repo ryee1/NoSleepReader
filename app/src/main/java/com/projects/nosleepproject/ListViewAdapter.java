@@ -43,6 +43,7 @@ public class ListViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ViewHolder holder;
+        String author = mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_AUTHOR);
         if(row == null){
             row = mInflater.inflate(R.layout.list_view_row, parent, false);
         }
@@ -53,7 +54,7 @@ public class ListViewAdapter extends BaseAdapter {
         }
         holder.title.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_TITLE));
         holder.score.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_SCORE));
-        holder.author.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_AUTHOR));
+        holder.author.setText("Submitted by: " + author);
 
         return row;
     }

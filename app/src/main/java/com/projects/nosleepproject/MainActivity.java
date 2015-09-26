@@ -34,12 +34,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String mAfter;
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
+    private int mPosition = ListView.INVALID_POSITION;
 
     private String mCurrentTable;
 
     private int count = 0;
     private boolean firstRun = true;
-    private static String MFRAG_TAG = "mfrag";
+
+    private static final String MFRAG_TAG = "mfrag";
+    public static final String LIST_POSITION_TAG = "list_position";
+    public static final String CURRENT_TABLE_TAG = "current_table_tag";
+    public static final String MAFTER_TAG = "mafter_tag";
+    public static final String COUNT_TAG = "count_tag";
 
     public ProgressBar loadingPanel;
 
@@ -48,12 +54,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         if (mFrag == null) {
             getSupportFragmentManager().beginTransaction().add(new ModelFragment(), MFRAG_TAG).commit();
             getSupportFragmentManager().executePendingTransactions();
-
-            mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
+            Log.e("MainActivity Frag: ", "Ran");
         }
+        mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
 
         loadingPanel = (ProgressBar) findViewById(R.id.loading_panel);
         mListView = (ListView) findViewById(R.id.listView);
@@ -126,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void resetList() {
         mValuesArray = new ArrayList<>();
+        mAfter = null;
         firstRun = true;
         count = 0;
         loadingPanel.setVisibility(View.VISIBLE);
@@ -172,22 +180,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().registerSticky(this);
+        if(mPosition != ListView.INVALID_POSITION){
+
+            Log.e("onResume", Integer.toString(mPosition));
+            mListView.setSelection(mPosition);
+        }
+
+
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        mPosition = savedInstanceState.getInt(LIST_POSITION_TAG);
+        mCurrentTable = savedInstanceState.getString(CURRENT_TABLE_TAG);
+        count = savedInstanceState.getInt(COUNT_TAG);
+        mAfter = savedInstanceState.getString(MAFTER_TAG);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        mPosition = mListView.getFirstVisiblePosition();
+
+        outState.putInt(LIST_POSITION_TAG, mPosition);
+        outState.putString(CURRENT_TABLE_TAG, mCurrentTable);
+        outState.putString(MAFTER_TAG, mAfter);
+        outState.putInt(COUNT_TAG, count);
         super.onSaveInstanceState(outState);
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ListingLoadedEvent event) {
-        if(mFrag.scrollLoading)
-            return;
+//        if(mFrag.scrollLoading)
+//            return;
         mValuesArray = event.getValues();
         mAfter = event.getAfter();
         if (firstRun) {
@@ -256,16 +281,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             , int totalItemCount) {
 
         int lastInScreen = firstVisibleItem + visibleItemCount;
-        Log.e("After: ", mAfter);
         if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
             loadingPanel.setVisibility(View.VISIBLE);
             count += 30;
             Log.e("count: ", Integer.toString(count));
             getCurrentList();
         }
-        //Added to fix progressbar showing when end of list is reached
-        if(!mFrag.scrollLoading){
-            loadingPanel.setVisibility(View.GONE);
-        }
+//        //Added to fix progressbar showing when end of list is reached
+//        if(!mFrag.scrollLoading){
+//            loadingPanel.setVisibility(View.GONE);
+//        }
     }
 }

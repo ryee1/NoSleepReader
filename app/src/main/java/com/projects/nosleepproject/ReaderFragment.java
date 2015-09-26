@@ -26,7 +26,7 @@ public class ReaderFragment extends Fragment{
     private ApiService service;
     private WebView webView;
     private TextView textView;
-
+    private String htmltext = null;
 
     public static ReaderFragment getInstance(String url){
         ReaderFragment f = new ReaderFragment();
@@ -45,35 +45,33 @@ public class ReaderFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_reader, container, false);
 
         textView = (TextView) view.findViewById(R.id.webView_fragment);
+            Bundle bundle = this.getArguments();
+            String url = bundle.getString(ReaderActivity.READER_URL_KEY);
 
-        Bundle bundle = this.getArguments();
-        String url = bundle.getString(ReaderActivity.READER_URL_KEY);
+            String base_url = url.substring(0, url.length() - 1);
 
-        String base_url = url.substring(0, url.length() - 1);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(base_url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            service = retrofit.create(ApiService.class);
+            Call<DetailModel[]> call = service.getText(ApiService.RAW_JSON);
+            call.enqueue(new Callback<DetailModel[]>() {
+                @Override
+                public void onResponse(Response<DetailModel[]> response) {
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(base_url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        service = retrofit.create(ApiService.class);
-        Call<DetailModel[]> call = service.getText(ApiService.RAW_JSON);
-        call.enqueue(new Callback<DetailModel[]>() {
-            @Override
-            public void onResponse(Response<DetailModel[]> response) {
+                    htmltext = response.body()[0].getData().getChildren().get(0).getChildrenData().getSelftext_html();
+                    textView.setText(Html.fromHtml(htmltext));
+                    textView.setMovementMethod(LinkMovementMethod.getInstance());
 
-                String data = response.body()[0].getData().getChildren().get(0).getChildrenData().getSelftext_html();
-                textView.setText(Html.fromHtml(data));
-                textView.setMovementMethod(LinkMovementMethod.getInstance());
+                    Log.e("detail: ", htmltext);
+                }
 
-                Log.e("detail: ", data);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("detail failure: ", "");
-            }
-        });
-
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("detail failure: ", "");
+                }
+            });
         return view;
     }
 }
