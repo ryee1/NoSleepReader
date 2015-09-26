@@ -11,4 +11,12 @@
     <string name="nav_header_title">NoSleep Reader</string>
     <string name="best_of">Best of</string>
     <string name="submitted_by">Submitted By:</string>
+    <string name="search_nosleep">Search NoSleep</string>
+    <string name="front_page">Front Page</string>
+    <string name="menu_2010">2010</string>
+    <string name="menu_2011">2011</string>
+    <string name="menu_2012">2012</string>
+    <string name="menu_2013">2013</string>
+    <string name="menu_2014">2014</string>
+    <string name="menu_2015">2015</string>
 </resources>

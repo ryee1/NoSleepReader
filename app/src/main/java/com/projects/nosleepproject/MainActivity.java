@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String MAFTER_TAG = "mafter_tag";
     public static final String COUNT_TAG = "count_tag";
 
+    public static final String FRONTPAGE_TAG = "front_page";
+
     public ProgressBar loadingPanel;
 
     @Override
@@ -82,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int id = menuItem.getItemId();
 
                 switch (id) {
+                    case R.id.front_page:
+                        resetList();
+                        mCurrentTable = FRONTPAGE_TAG;
+                        mFrag.getFrontPage("", mValuesArray, 0);
+                        mDrawer.closeDrawers();
+                        break;
                     case R.id.nav_year_one:
                         resetList();
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_ONE;
@@ -143,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String timestamp = null;
         String table = null;
         switch(mCurrentTable){
+            case FRONTPAGE_TAG:
+                mFrag.getFrontPage(mAfter, mValuesArray, count);
             case ListingDbHelper.TABLE_NAME_YEAR_ONE:
                 table = ListingDbHelper.TABLE_NAME_YEAR_ONE;
                 timestamp = ListingDbHelper.UNIX_YEAR_ONE;
@@ -284,12 +294,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
             loadingPanel.setVisibility(View.VISIBLE);
             count += 30;
-            Log.e("count: ", Integer.toString(count));
             getCurrentList();
         }
-//        //Added to fix progressbar showing when end of list is reached
-//        if(!mFrag.scrollLoading){
-//            loadingPanel.setVisibility(View.GONE);
-//        }
+
     }
 }

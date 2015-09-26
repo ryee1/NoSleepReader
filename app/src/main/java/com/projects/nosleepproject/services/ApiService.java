@@ -25,6 +25,11 @@ public interface ApiService {
                                    @Query("q") String q, @Query("syntax") String SYNTAX, @Query("after")
                                    String after, @Query("count") int count);
 
+    //front page
+    @GET(".json")
+    Call<ListingsModel> loadfrontPage(@Query("raw_json") int RAW_JSON, @Query("restrict_sr") String RESTRICT_SR,
+                                     @Query("after") String after, @Query("count") int count);
+
     @GET(".json")
     Call<DetailModel[]> getText(@Query("raw_json") int RAW_JSON);
 }

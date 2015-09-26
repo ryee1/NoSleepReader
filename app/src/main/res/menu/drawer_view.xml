@@ -1,26 +1,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/front_page"
+            android:title="@string/front_page" />
+        <item
+            android:id="@+id/search_nosleep"
+            android:title="@string/search_nosleep"/>
+    </group>
     <item android:title="@string/best_of">
         <menu>
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/nav_year_one"
-                    android:title="2010" />
+                    android:title="@string/menu_2010" />
                 <item
                     android:id="@+id/nav_year_two"
-                    android:title="2011" />
+                    android:title="@string/menu_2011" />
                 <item
                     android:id="@+id/nav_year_three"
-                    android:title="2012" />
+                    android:title="@string/menu_2012" />
                 <item
                     android:id="@+id/nav_year_four"
-                    android:title="2013" />
+                    android:title="@string/menu_2013" />
                 <item
                     android:id="@+id/nav_year_five"
-                    android:title="2014" />
+                    android:title="@string/menu_2014" />
                 <item
                     android:id="@+id/nav_year_six"
-                    android:title="2015" />
+                    android:title="@string/menu_2015" />
             </group>
         </menu>
     </item>

@@ -59,12 +59,13 @@ public class ReaderFragment extends Fragment{
             call.enqueue(new Callback<DetailModel[]>() {
                 @Override
                 public void onResponse(Response<DetailModel[]> response) {
-
-                    htmltext = response.body()[0].getData().getChildren().get(0).getChildrenData().getSelftext_html();
-                    textView.setText(Html.fromHtml(htmltext));
-                    textView.setMovementMethod(LinkMovementMethod.getInstance());
-
-                    Log.e("detail: ", htmltext);
+                    try {
+                        htmltext = response.body()[0].getData().getChildren().get(0).getChildrenData().getSelftext_html();
+                        textView.setText(Html.fromHtml(htmltext));
+                        textView.setMovementMethod(LinkMovementMethod.getInstance());
+                    }catch (Exception e) {
+                        Log.e("ReaderFragment: ", "onResponse failure");
+                    }
                 }
 
                 @Override

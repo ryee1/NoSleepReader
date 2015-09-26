@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
+import com.projects.nosleepproject.events.ListingLoadedEvent;
 import com.projects.nosleepproject.models.ListingsModel;
 import com.projects.nosleepproject.services.ApiService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
@@ -21,7 +23,7 @@ import retrofit.Retrofit;
 
 public class ModelFragment extends Fragment {
 
-    private ApiService service;
+    private ApiService searchService;
     private ListingDbHelper mDbHelper;
     private List<ContentValues> contentArray;
 
@@ -49,15 +51,15 @@ public class ModelFragment extends Fragment {
                 .baseUrl(MFRAG_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        service = retrofit.create(ApiService.class);
+        searchService = retrofit.create(ApiService.class);
       //  getListings("timestamp:338166428..1348009628", "", contentArray, 0);
     }
 
     public void getListings(final String timestamp, final String after,
                              final List<ContentValues> contentArray, int count, final String table) {
         scrollLoading = true;
-        Call<ListingsModel> call = service.searchBulk(service.TOP, service.RAW_JSON,
-                service.RESTRICT_SR, timestamp, service.SYNTAX, after, count);
+        Call<ListingsModel> call = searchService.searchBulk(searchService.TOP, searchService.RAW_JSON,
+                searchService.RESTRICT_SR, timestamp, searchService.SYNTAX, after, count);
         call.enqueue(new Callback<ListingsModel>() {
             @Override
             public void onResponse(Response<ListingsModel> response) {
@@ -70,6 +72,7 @@ public class ModelFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Log.e("getListings error: ", after);
                 }
                 finally{
@@ -83,6 +86,45 @@ public class ModelFragment extends Fragment {
                 Log.e("getListings: ", "failed to get list");
             }
         });
-        Log.e("Modelfragment before:", table);
+        Log.e("getListings:", table);
+    }
+
+    public void getFrontPage(final String after, final List<ContentValues> contentArray, int count){
+        scrollLoading = true;
+        Call<ListingsModel> call = searchService.loadfrontPage(ApiService.RAW_JSON, ApiService.RESTRICT_SR, after, count);
+        call.enqueue(new Callback<ListingsModel>() {
+            @Override
+            public void onResponse(Response<ListingsModel> response) {
+                try{
+                    String after = response.body().getData().getAfter();
+
+                    List<ListingsModel.Children> list = response.body().getData().getChildren();
+                    if(after != null){
+                        for(int i = 0; i < response.body().getData().getChildren().size(); i++){
+                            ContentValues values = new ContentValues();
+                            values.put(ListingDbHelper.COLUMN_ID, list.get(i).getChildrenData().getId());
+                            values.put(ListingDbHelper.COLUMN_AUTHOR, list.get(i).getChildrenData().getAuthor());
+                            values.put(ListingDbHelper.COLUMN_TITLE, list.get(i).getChildrenData().getTitle());
+                            values.put(ListingDbHelper.COLUMN_SCORE, list.get(i).getChildrenData().getScore());
+                            values.put(ListingDbHelper.COLUMN_URL, list.get(i).getChildrenData().getUrl());
+                            contentArray.add(values);
+                        }
+                        EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                    Log.e("getFrontpage:", "onResponse error");
+                }
+                finally{
+                    scrollLoading = false;
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                scrollLoading = false;
+                Log.e("getFrontpage: ", "failed to get front page");
+            }
+        });
     }
 }
