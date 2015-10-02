@@ -14,29 +14,7 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.events;
+package com.projects.nosleepproject.data;
 
-import android.content.ContentValues;
-
-import java.util.List;
-
-/**
- * Created by ry on 9/19/15.
- */
-public class ListingLoadedEvent {
-    private List<ContentValues> values;
-    private String after;
-
-    public ListingLoadedEvent(List<ContentValues> values, String after) {
-        this.values = values;
-        this.after = after;
-    }
-
-    public String getAfter() {
-        return after;
-    }
-
-    public List<ContentValues> getValues() {
-        return values;
-    }
+public class s {
 }
