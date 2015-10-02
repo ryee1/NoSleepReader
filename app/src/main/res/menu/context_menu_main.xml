@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/copy_url"
+        android:title="@string/context_url_to_clipboard"/>
+    <item
+        android:id="@+id/context_menu_favorite"
+        android:title="@string/add_to_favorite"/>
+    <item
+        android:id="@+id/context_menu_author"
+        android:title="@string/context_author"/>
+</menu>

@@ -19,8 +19,11 @@
             android:id="@+id/listView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_below="@+id/toolbar"/>
+            android:layout_below="@+id/toolbar"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/list_divider"
+            android:dividerHeight="1dp"
+            />
         <ProgressBar
             android:id="@+id/loading_panel"
             android:layout_width="wrap_content"
@@ -36,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white"
+        style="@style/nav_style"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_view" />
 </android.support.v4.widget.DrawerLayout>

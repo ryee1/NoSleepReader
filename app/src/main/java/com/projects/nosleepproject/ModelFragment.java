@@ -35,7 +35,7 @@ public class ModelFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public List<ContentValues> getContentArray() {
+    public synchronized List<ContentValues> getContentArray() {
         return contentArray;
     }
 
@@ -52,10 +52,36 @@ public class ModelFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         searchService = retrofit.create(ApiService.class);
-      //  getListings("timestamp:338166428..1348009628", "", contentArray, 0);
     }
 
-    public void getListings(final String timestamp, final String after,
+    public synchronized void getAuthor(final String after, final List<ContentValues> contentArray,
+                                       int count, String author){
+        scrollLoading = true;
+        Call<ListingsModel> call = searchService.searchAuthor(searchService.RAW_JSON, searchService.RESTRICT_SR,
+                author, after, count);
+        call.enqueue(new Callback<ListingsModel>() {
+            @Override
+            public void onResponse(Response<ListingsModel> response) {
+                try {
+                    if (after != null) {
+                        ModelToContentvalue(response.body());
+                    }
+                    EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
+                }catch (Exception e){
+
+                }finally{
+                    scrollLoading = false;
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e("getAuthor", "Failed to get Author List");
+            }
+        });
+    }
+
+    public synchronized void getListings(final String timestamp, final String after,
                              final List<ContentValues> contentArray, int count, final String table) {
         scrollLoading = true;
         Call<ListingsModel> call = searchService.searchBulk(searchService.TOP, searchService.RAW_JSON,
@@ -68,7 +94,7 @@ public class ModelFragment extends Fragment {
 
                     Log.e("ModelFragment: ", after);
                     if(after != null) {
-                        mDbHelper.insertTable(response.body(), contentArray, table);
+                        mDbHelper.loadTable(response.body(), contentArray, table);
                     }
 
                 } catch (Exception e) {
@@ -89,33 +115,24 @@ public class ModelFragment extends Fragment {
         Log.e("getListings:", table);
     }
 
-    public void getFrontPage(final String after, final List<ContentValues> contentArray, int count){
+    public synchronized void getFrontPage(final String after, final List<ContentValues> contentArray, int count){
         scrollLoading = true;
         Call<ListingsModel> call = searchService.loadfrontPage(ApiService.RAW_JSON, ApiService.RESTRICT_SR, after, count);
         call.enqueue(new Callback<ListingsModel>() {
             @Override
             public void onResponse(Response<ListingsModel> response) {
-                try{
+                try {
                     String after = response.body().getData().getAfter();
 
                     List<ListingsModel.Children> list = response.body().getData().getChildren();
-                    if(after != null){
-                        for(int i = 0; i < response.body().getData().getChildren().size(); i++){
-                            ContentValues values = new ContentValues();
-                            values.put(ListingDbHelper.COLUMN_ID, list.get(i).getChildrenData().getId());
-                            values.put(ListingDbHelper.COLUMN_AUTHOR, list.get(i).getChildrenData().getAuthor());
-                            values.put(ListingDbHelper.COLUMN_TITLE, list.get(i).getChildrenData().getTitle());
-                            values.put(ListingDbHelper.COLUMN_SCORE, list.get(i).getChildrenData().getScore());
-                            values.put(ListingDbHelper.COLUMN_URL, list.get(i).getChildrenData().getUrl());
-                            contentArray.add(values);
-                        }
+                    if (after != null) {
+                        ModelToContentvalue(response.body());
                         EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     Log.e("getFrontpage:", "onResponse error");
-                }
-                finally{
+                } finally {
                     scrollLoading = false;
                 }
             }
@@ -126,5 +143,23 @@ public class ModelFragment extends Fragment {
                 Log.e("getFrontpage: ", "failed to get front page");
             }
         });
+    }
+
+    public synchronized void getFavorites(List<ContentValues> contentArray){
+        mDbHelper.queryTable(ListingDbHelper.TABLE_NAME_FAVORITES, contentArray);
+    }
+
+    // Helper method to convert ListingsModel into an Arraylist of ContentValues
+    private void ModelToContentvalue(ListingsModel listingsModel){
+        List<ListingsModel.Children> list = listingsModel.getData().getChildren();
+        for (int i = 0; i < listingsModel.getData().getChildren().size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(ListingDbHelper.COLUMN_ID, list.get(i).getChildrenData().getId());
+            values.put(ListingDbHelper.COLUMN_AUTHOR, list.get(i).getChildrenData().getAuthor());
+            values.put(ListingDbHelper.COLUMN_TITLE, list.get(i).getChildrenData().getTitle());
+            values.put(ListingDbHelper.COLUMN_SCORE, list.get(i).getChildrenData().getScore());
+            values.put(ListingDbHelper.COLUMN_URL, list.get(i).getChildrenData().getUrl());
+            contentArray.add(values);
+        }
     }
 }

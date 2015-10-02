@@ -32,5 +32,10 @@ public interface ApiService {
 
     @GET(".json")
     Call<DetailModel[]> getText(@Query("raw_json") int RAW_JSON);
+
+
+    @GET("search.json")
+    Call<ListingsModel> searchAuthor(@Query("raw_json") int RAW_JSON, @Query("restrict_sr") String RESTRICT_SR,
+                                   @Query("q") String q, @Query("after") String after, @Query("count") int count);
 }
 

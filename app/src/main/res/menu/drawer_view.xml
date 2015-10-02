@@ -4,6 +4,9 @@
             android:id="@+id/front_page"
             android:title="@string/front_page" />
         <item
+            android:id="@+id/favorites"
+            android:title="@string/context_favorites"/>
+        <item
             android:id="@+id/search_nosleep"
             android:title="@string/search_nosleep"/>
     </group>

@@ -1,7 +1,11 @@
 package com.projects.nosleepproject;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,16 +21,18 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
 import com.projects.nosleepproject.events.ListingLoadedEvent;
+import com.projects.nosleepproject.events.QueryListingEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,
+        AbsListView.OnScrollListener{
 
     private ModelFragment mFrag;
     private ListView mListView;
@@ -35,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private int mPosition = ListView.INVALID_POSITION;
+    private ListingDbHelper mDbHelper;
 
     private String mCurrentTable;
 
@@ -49,11 +57,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public static final String FRONTPAGE_TAG = "front_page";
 
+    public static final String LOADING_TOAST_TEXT = "Still Loading...";
+
     public ProgressBar loadingPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDbHelper = ListingDbHelper.getInstance(this);
         setContentView(R.layout.activity_main);
 
 
@@ -75,19 +86,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         NavigationView nView = (NavigationView) findViewById(R.id.nvView);
         setupDrawerContent(nView);
+
+        registerForContextMenu(mListView);
     }
 
+    public void onFirstRun(){
+        resetList();
+        mCurrentTable = FRONTPAGE_TAG;
+        mFrag.getFrontPage("", mValuesArray, 0);
+    }
     public void setupDrawerContent(NavigationView nView) {
         nView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 int id = menuItem.getItemId();
-
+                if(mFrag.scrollLoading){
+                    Toast.makeText(getBaseContext(), LOADING_TOAST_TEXT, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
                 switch (id) {
                     case R.id.front_page:
                         resetList();
                         mCurrentTable = FRONTPAGE_TAG;
                         mFrag.getFrontPage("", mValuesArray, 0);
+                        mDrawer.closeDrawers();
+                        break;
+                    case R.id.favorites:
+                        resetList();
+                        mCurrentTable = ListingDbHelper.TABLE_NAME_FAVORITES;
+                        mFrag.getFavorites(mValuesArray);
                         mDrawer.closeDrawers();
                         break;
                     case R.id.nav_year_one:
@@ -103,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_TWO, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_TWO);
                         mDrawer.closeDrawers();
+
                         break;
                     case R.id.nav_year_three:
                         resetList();
@@ -132,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 ListingDbHelper.TABLE_NAME_YEAR_SIX);
                         mDrawer.closeDrawers();
                         break;
+
                 }
 
                 return true;
@@ -140,7 +169,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void resetList() {
-        mValuesArray = new ArrayList<>();
+        if(mValuesArray != null)
+            mValuesArray.clear();
+        mValuesArray = mFrag.getContentArray();
+        mPosition = ListView.INVALID_POSITION;
         mAfter = null;
         firstRun = true;
         count = 0;
@@ -151,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String timestamp = null;
         String table = null;
         switch(mCurrentTable){
+            case ListingDbHelper.TABLE_NAME_FAVORITES:;
+                return;
             case FRONTPAGE_TAG:
                 mFrag.getFrontPage(mAfter, mValuesArray, count);
             case ListingDbHelper.TABLE_NAME_YEAR_ONE:
@@ -182,6 +216,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     @Override
     protected void onPause() {
+        if(firstRun != true){
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(LIST_POSITION_TAG, mPosition);
+            editor.putString(CURRENT_TABLE_TAG, mCurrentTable);
+            editor.putString(MAFTER_TAG, mAfter);
+            editor.putInt(COUNT_TAG, count);
+            editor.commit();
+        }
         EventBus.getDefault().unregister(this);
         super.onPause();
     }
@@ -195,34 +238,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.e("onResume", Integer.toString(mPosition));
             mListView.setSelection(mPosition);
         }
-
+        if(firstRun != true){
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            mPosition = sharedPref.getInt(LIST_POSITION_TAG, mPosition);
+            mCurrentTable = sharedPref.getString(CURRENT_TABLE_TAG, mCurrentTable);
+            mAfter = sharedPref.getString(MAFTER_TAG, mAfter);
+            count = sharedPref.getInt(COUNT_TAG, count);
+        }
+        else{
+            onFirstRun();
+        }
 
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        mPosition = savedInstanceState.getInt(LIST_POSITION_TAG);
-        mCurrentTable = savedInstanceState.getString(CURRENT_TABLE_TAG);
-        count = savedInstanceState.getInt(COUNT_TAG);
-        mAfter = savedInstanceState.getString(MAFTER_TAG);
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        mPosition = mListView.getFirstVisiblePosition();
-
-        outState.putInt(LIST_POSITION_TAG, mPosition);
-        outState.putString(CURRENT_TABLE_TAG, mCurrentTable);
-        outState.putString(MAFTER_TAG, mAfter);
-        outState.putInt(COUNT_TAG, count);
-        super.onSaveInstanceState(outState);
-    }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(ListingLoadedEvent event) {
-//        if(mFrag.scrollLoading)
-//            return;
         mValuesArray = event.getValues();
         mAfter = event.getAfter();
         if (firstRun) {
@@ -239,6 +270,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(QueryListingEvent event){
+        mValuesArray = event.getValuesArray();
+        mAdapter = new ListViewAdapter(this, mValuesArray);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
+        Log.e("mPosition: ", Integer.toString(mPosition));
+        if(mPosition != ListView.INVALID_POSITION)
+            mListView.setSelection(mPosition);
+        loadingPanel.setVisibility(View.GONE);
+        firstRun = false;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -272,6 +316,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         try {
+            if(mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL).equals("")){
+                return;
+            }
             String url = mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL);
             Intent intent = new Intent(this, ReaderActivity.class);
             intent.putExtra(ReaderActivity.READER_URL_KEY, url);
@@ -292,10 +339,76 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         int lastInScreen = firstVisibleItem + visibleItemCount;
         if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
-            loadingPanel.setVisibility(View.VISIBLE);
-            count += 30;
-            getCurrentList();
+            if(!mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
+                loadingPanel.setVisibility(View.VISIBLE);
+                count += 25;
+                getCurrentList();
+            }
         }
+    }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu_main, menu);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        menu.setHeaderTitle(mValuesArray.get(info.position).getAsString(ListingDbHelper.COLUMN_TITLE));
+        MenuItem favorites = menu.findItem(R.id.context_menu_favorite);
+        if(mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)){
+            favorites.setTitle("Remove from Favorites");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if(mFrag.scrollLoading){
+            Toast.makeText(this, LOADING_TOAST_TEXT, Toast.LENGTH_SHORT);
+            return true;
+        }
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int id = item.getItemId();
+        switch(id){
+            case R.id.copy_url:
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("label", mValuesArray.get(info.position)
+                        .getAsString(ListingDbHelper.COLUMN_URL));
+                clipboard.setPrimaryClip(clip);
+                break;
+            case R.id.context_menu_favorite:
+                if(mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)){
+                    mPosition = (info.position - 1 >= 0) ? info.position - 1 : 0;
+                    mDbHelper.deleteFavoites(mValuesArray.get(info.position).getAsString(ListingDbHelper.COLUMN_ID));
+                    mFrag.getFavorites(mValuesArray);
+                }
+                else
+                    mDbHelper.insertFavorites(mValuesArray.get(info.position));
+                break;
+            case R.id.context_menu_author:
+
+
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear().commit();
+        resetList();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mDrawer.isDrawerOpen(GravityCompat.START)){
+            mDrawer.closeDrawers();
+            return;
+        }
+        super.onBackPressed();
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear().commit();
+        resetList();
     }
 }

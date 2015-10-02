@@ -56,6 +56,9 @@ public class ListViewAdapter extends BaseAdapter {
         holder.score.setText(mValuesArray.get(position).getAsString(ListingDbHelper.COLUMN_SCORE));
         holder.author.setText("Submitted by: " + author);
 
+        // Dynamically set Score's width to the width taken up by the String "0000"
+        float measureText = holder.score.getPaint().measureText("0000");
+        holder.score.setWidth(holder.score.getPaddingLeft() + holder.score.getPaddingRight() + (int) measureText);
         return row;
     }
 

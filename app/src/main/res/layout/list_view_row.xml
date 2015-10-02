@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="16dp">
+    android:orientation="vertical">
 
 
     <LinearLayout
@@ -13,11 +12,12 @@
         android:orientation="horizontal">
 
         <TextView
+            style="@style/nav_style"
             android:id="@+id/score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:paddingRight="25dp"
+            android:gravity="center"
+            android:padding="5dp"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -28,6 +28,7 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/nav_style"
                 android:id="@+id/submission_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,6 +37,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
+                style="@style/nav_style"
                 android:id="@+id/author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

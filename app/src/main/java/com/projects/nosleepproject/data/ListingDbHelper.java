@@ -2,6 +2,7 @@ package com.projects.nosleepproject.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Process;
@@ -9,6 +10,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.projects.nosleepproject.events.ListingLoadedEvent;
+import com.projects.nosleepproject.events.QueryListingEvent;
 import com.projects.nosleepproject.models.ListingsModel;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
     public static final String TABLE_NAME_YEAR_FOUR = "year_2013";
     public static final String TABLE_NAME_YEAR_FIVE = "year_2014";
     public static final String TABLE_NAME_YEAR_SIX = "year_2015";
+    public static final String TABLE_NAME_FAVORITES = "favorites_table";
 
     public static final String COLUMN_ID = "r_id";
     public static final String COLUMN_AUTHOR = "author";
@@ -60,48 +63,56 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
 
         final String SQL_CREATE_LIST_TABLE_ONE = "CREATE TABLE " + TABLE_NAME_YEAR_ONE + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
         final String SQL_CREATE_LIST_TABLE_TWO = "CREATE TABLE " + TABLE_NAME_YEAR_TWO + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
         final String SQL_CREATE_LIST_TABLE_THREE = "CREATE TABLE " + TABLE_NAME_YEAR_THREE + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
         final String SQL_CREATE_LIST_TABLE_FOUR = "CREATE TABLE " + TABLE_NAME_YEAR_FOUR + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
         final String SQL_CREATE_LIST_TABLE_FIVE = "CREATE TABLE " + TABLE_NAME_YEAR_FIVE + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
 
         final String SQL_CREATE_LIST_TABLE_SIX = "CREATE TABLE " + TABLE_NAME_YEAR_SIX + " ( " +
                 _ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_ID + " VARCHAR NOT NULL, " +
-                COLUMN_AUTHOR + " TEXT UNIQUE NOT NULL, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
+                COLUMN_TITLE + " TEXT NOT NULL, " +
+                COLUMN_SCORE + " INTEGER NOT NULL, " +
+                COLUMN_URL + " TEXT NOT NULL );";
+
+        final String SQL_CREATE_LIST_TABLE_FAVORITES = "CREATE TABLE " + TABLE_NAME_FAVORITES + " ( " +
+                _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ID + " VARCHAR UNIQUE NOT NULL, " +
+                COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 COLUMN_TITLE + " TEXT NOT NULL, " +
                 COLUMN_SCORE + " INTEGER NOT NULL, " +
                 COLUMN_URL + " TEXT NOT NULL );";
@@ -111,19 +122,41 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
         sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_THREE);
         sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_FOUR);
         sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_FIVE);
-        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_SIX);
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_SIX);;
+        sqLiteDatabase.execSQL(SQL_CREATE_LIST_TABLE_FAVORITES);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        Log.e("onUpgrade: ", "How did I get here");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_ONE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_TWO);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_THREE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_FOUR);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_FIVE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_YEAR_SIX);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_FAVORITES);
+        onCreate(sqLiteDatabase);
     }
 
-    public synchronized void insertTable(ListingsModel listingsModel, List<ContentValues> valuesArray,
-                                         String table){
+    public void loadTable(ListingsModel listingsModel, List<ContentValues> valuesArray,
+                                       String table){
         new LoadListingEvent(listingsModel, valuesArray, table).start();
     }
 
+    public void queryTable(String table, List<ContentValues> valuesarray){
+        new QueryListingThread(table, valuesarray).start();
+    }
+
+    public void insertFavorites(ContentValues values){
+        SQLiteDatabase db = getWritableDatabase();
+        db.insertWithOnConflict(TABLE_NAME_FAVORITES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public void deleteFavoites(String id){
+        SQLiteDatabase db = getWritableDatabase();
+        Log.e("deletefav", id);
+        db.delete(TABLE_NAME_FAVORITES, COLUMN_ID + "=?", new String[] {id});
+    }
     private class LoadListingEvent extends Thread{
         private ListingsModel listingsModel;
         private List<ContentValues> valuesArray;
@@ -157,11 +190,10 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                     db.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_IGNORE);
                 }
                 String after = listingsModel.getData().getAfter();
-                Log.e("ListingDbHelper: ", valuesArray.get(0).getAsString(COLUMN_AUTHOR));
                 EventBus.getDefault().postSticky(new ListingLoadedEvent(valuesArray, after));
                 db.setTransactionSuccessful();
             } catch(Exception e){
-                Log.e("Error Loading db: ", valuesArray.get(0).getAsString(COLUMN_TITLE));
+                Log.e("LoadListingEvent: ", "Error inserting DB");
                 e.printStackTrace();
             } finally{
                 db.endTransaction();
@@ -171,14 +203,42 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
 
     private class QueryListingThread extends Thread{
 
-        SQLiteDatabase db = getReadableDatabase();
-        public QueryListingThread(){
-
+        private String table;
+        List<ContentValues> valuesArray;
+        public QueryListingThread(String table, List<ContentValues> valuesArray){
+            this.table = table;
+            this.valuesArray = valuesArray;
+            this.valuesArray.clear();
         }
 
         @Override
         public void run() {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+            SQLiteDatabase db = getReadableDatabase();
+
+            Cursor cursor = db.query(table, null, null, null, null, null, null);
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()){
+                ContentValues values = new ContentValues();
+                values.put(_ID, cursor.getInt(cursor.getColumnIndex(_ID)));
+                values.put(COLUMN_ID, cursor.getString(cursor.getColumnIndex(COLUMN_ID)));
+                values.put(COLUMN_AUTHOR, cursor.getString(cursor.getColumnIndex(COLUMN_AUTHOR)));
+                values.put(COLUMN_TITLE, cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
+                values.put(COLUMN_SCORE, cursor.getInt(cursor.getColumnIndex(COLUMN_SCORE)));
+                values.put(COLUMN_URL, cursor.getString(cursor.getColumnIndex(COLUMN_URL)));
+                valuesArray.add(values);
+                cursor.moveToNext();
+            }
+            if(valuesArray.size() == 0){
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_ID, "1");
+                values.put(COLUMN_AUTHOR, "");
+                values.put(COLUMN_TITLE, "Empty Favorites List");
+                values.put(COLUMN_SCORE, "");
+                values.put(COLUMN_URL, "");
+                valuesArray.add(values);
+            }
+            EventBus.getDefault().postSticky(new QueryListingEvent(valuesArray));
         }
     }
 }
