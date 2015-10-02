@@ -54,7 +54,7 @@ public class ModelFragment extends Fragment {
         searchService = retrofit.create(ApiService.class);
     }
 
-    public synchronized void getAuthor(final String after, final List<ContentValues> contentArray,
+    public synchronized void getAuthor(String after, final List<ContentValues> contentArray,
                                        int count, String author){
         scrollLoading = true;
         Call<ListingsModel> call = searchService.searchAuthor(searchService.RAW_JSON, searchService.RESTRICT_SR,
@@ -63,9 +63,8 @@ public class ModelFragment extends Fragment {
             @Override
             public void onResponse(Response<ListingsModel> response) {
                 try {
-                    if (after != null) {
-                        ModelToContentvalue(response.body());
-                    }
+                    String after = response.body().getData().getAfter();
+                    ModelToContentvalue(response.body());
                     EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                 }catch (Exception e){
 
@@ -93,9 +92,7 @@ public class ModelFragment extends Fragment {
                     String after = response.body().getData().getAfter();
 
                     Log.e("ModelFragment: ", after);
-                    if(after != null) {
                         mDbHelper.loadTable(response.body(), contentArray, table);
-                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -115,7 +112,7 @@ public class ModelFragment extends Fragment {
         Log.e("getListings:", table);
     }
 
-    public synchronized void getFrontPage(final String after, final List<ContentValues> contentArray, int count){
+    public synchronized void getFrontPage(String after, final List<ContentValues> contentArray, int count){
         scrollLoading = true;
         Call<ListingsModel> call = searchService.loadfrontPage(ApiService.RAW_JSON, ApiService.RESTRICT_SR, after, count);
         call.enqueue(new Callback<ListingsModel>() {

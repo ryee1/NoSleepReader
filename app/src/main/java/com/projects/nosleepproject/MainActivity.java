@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private int mPosition = ListView.INVALID_POSITION;
     private ListingDbHelper mDbHelper;
 
+    // For onScroll when user is in Get More From Author list
+    private String mAuthor;
+
     private String mCurrentTable;
 
     private int count = 0;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String COUNT_TAG = "count_tag";
 
     public static final String FRONTPAGE_TAG = "front_page";
+    public static final String CURRENT_AUTHOR_TAG = "current_author";
 
     public static final String LOADING_TOAST_TEXT = "Still Loading...";
 
@@ -184,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String table = null;
         switch(mCurrentTable){
             case ListingDbHelper.TABLE_NAME_FAVORITES:;
+                return;
+            case CURRENT_AUTHOR_TAG:
+                mFrag.getAuthor(mAfter, mValuesArray, count, mAuthor);
                 return;
             case FRONTPAGE_TAG:
                 mFrag.getFrontPage(mAfter, mValuesArray, count);
@@ -339,7 +346,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         int lastInScreen = firstVisibleItem + visibleItemCount;
         if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
-            if(!mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
+            if(mCurrentTable.equals(CURRENT_AUTHOR_TAG)){
+                loadingPanel.setVisibility(View.VISIBLE);
+                count += 25;
+                getCurrentList();
+            }
+            else if(!mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
                 loadingPanel.setVisibility(View.VISIBLE);
                 count += 25;
                 getCurrentList();
@@ -384,8 +396,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     mDbHelper.insertFavorites(mValuesArray.get(info.position));
                 break;
             case R.id.context_menu_author:
-
-
+                firstRun = true;
+                mCurrentTable = CURRENT_AUTHOR_TAG;
+                mAuthor = "author:" + mValuesArray.get(info.position).getAsString(ListingDbHelper.COLUMN_AUTHOR);
+                resetList();
+                Log.e("contextauthor", "mafter: " + mAfter + "count: " + count + "author: " + mAuthor);
+                mFrag.getAuthor(mAfter, mValuesArray, count, mAuthor);
         }
         return super.onContextItemSelected(item);
     }
