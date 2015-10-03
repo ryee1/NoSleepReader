@@ -92,12 +92,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
 
+        mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
         if (mFrag == null) {
-            getSupportFragmentManager().beginTransaction().add(new ModelFragment(), MFRAG_TAG).commit();
+            mFrag = new ModelFragment();
+            getSupportFragmentManager().beginTransaction().add(mFrag, MFRAG_TAG).commit();
             getSupportFragmentManager().executePendingTransactions();
             Log.e("MainActivity Frag: ", "Ran");
         }
-        mFrag = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MFRAG_TAG);
 
         loadingPanel = (ProgressBar) findViewById(R.id.loading_panel);
         mListView = (ListView) findViewById(R.id.listView);
@@ -234,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String table = null;
         switch (mCurrentTable) {
             case ListingDbHelper.TABLE_NAME_FAVORITES:
-                ;
                 return;
             case CURRENT_AUTHOR_TAG:
                 mFrag.getAuthor(mAfter, mValuesArray, count, mAuthor);
@@ -295,6 +295,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mCurrentTable = sharedPref.getString(CURRENT_TABLE_TAG, mCurrentTable);
             mAfter = sharedPref.getString(MAFTER_TAG, mAfter);
             count = sharedPref.getInt(COUNT_TAG, count);
+            mValuesArray = mFrag.getContentArray();
+
+            Log.e("onResume", Integer.toString(mValuesArray.size()));
             if (mPosition != ListView.INVALID_POSITION) {
 
                 mListView.setSelection(mPosition);
