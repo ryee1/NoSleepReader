@@ -16,8 +16,21 @@
 
 package com.projects.nosleepproject.events;
 
+import android.content.ContentValues;
+
+import java.util.List;
+
 /**
  * Created by ry on 9/29/15.
  */
 public class FailedLoadEvent {
+    private List<ContentValues> values;
+
+    public FailedLoadEvent(List<ContentValues> values) {
+        this.values = values;
+    }
+
+    public List<ContentValues> getValues() {
+        return values;
+    }
 }

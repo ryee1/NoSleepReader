@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
+import com.projects.nosleepproject.events.FailedLoadEvent;
 import com.projects.nosleepproject.events.ListingLoadedEvent;
 import com.projects.nosleepproject.models.ListingsModel;
 import com.projects.nosleepproject.services.ApiService;
@@ -91,7 +92,7 @@ public class ModelFragment extends Fragment {
 
             @Override
             public void onFailure(Throwable t) {
-                Log.e("getAuthor", "Failed to get Author List");
+                EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
             }
         });
     }
@@ -106,9 +107,7 @@ public class ModelFragment extends Fragment {
             public void onResponse(Response<ListingsModel> response) {
                 try {
                     String after = response.body().getData().getAfter();
-
-                    Log.e("ModelFragment: ", after);
-                        mDbHelper.loadTable(response.body(), contentArray, table);
+                    mDbHelper.loadTable(response.body(), contentArray, table);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -121,7 +120,9 @@ public class ModelFragment extends Fragment {
 
             @Override
             public void onFailure(Throwable t) {
+                mDbHelper.queryTable(table, contentArray);
                 scrollLoading = false;
+                EventBus.getDefault().postSticky(new FailedLoadEvent(contentArray));
                 Log.e("getListings: ", "failed to get list");
             }
         });
@@ -153,6 +154,7 @@ public class ModelFragment extends Fragment {
             @Override
             public void onFailure(Throwable t) {
                 scrollLoading = false;
+                EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
                 Log.e("getFrontpage: ", "failed to get front page");
             }
         });

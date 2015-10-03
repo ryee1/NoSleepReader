@@ -15,22 +15,29 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/nav_year_one"
-                    android:title="@string/menu_2010" />
+                    android:title="@string/menu_2010"
+                    android:icon="@drawable/star_off"/>
                 <item
                     android:id="@+id/nav_year_two"
-                    android:title="@string/menu_2011" />
+                    android:title="@string/menu_2011"
+                    android:icon="@drawable/star_off"
+                    />
                 <item
                     android:id="@+id/nav_year_three"
-                    android:title="@string/menu_2012" />
+                    android:title="@string/menu_2012"
+                    android:icon="@drawable/star_off"/>
                 <item
                     android:id="@+id/nav_year_four"
-                    android:title="@string/menu_2013" />
+                    android:title="@string/menu_2013"
+                    android:icon="@drawable/star_off"/>
                 <item
                     android:id="@+id/nav_year_five"
-                    android:title="@string/menu_2014" />
+                    android:title="@string/menu_2014"
+                    android:icon="@drawable/star_off"/>
                 <item
                     android:id="@+id/nav_year_six"
-                    android:title="@string/menu_2015" />
+                    android:title="@string/menu_2015"
+                    android:icon="@drawable/star_off"/>
             </group>
         </menu>
     </item>

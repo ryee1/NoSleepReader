@@ -3,10 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.projects.nosleepproject.ReaderActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/reader_copy_url"
+        android:title="@string/context_url_to_clipboard"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/reader_favorite"
+        android:title="@string/add_to_favorite"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/reader_share"
         app:actionProviderClass="android.support.v7.widget.ShareActionProvider"

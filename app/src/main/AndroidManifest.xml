@@ -22,6 +22,17 @@
             android:name=".ReaderActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_reader" >
+            <intent-filter android:label="Nosleep Reader">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http"
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/r/nosleep/comments"/>
+                <data android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/r/nosleep/comments"/>
+            </intent-filter>
         </activity>
     </application>
 

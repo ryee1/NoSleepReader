@@ -4,7 +4,7 @@
     <string name="action_settings">Settings</string>
     <string name="title">Nosleep Reader</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_reader">ReaderActivity</string>
+    <string name="title_activity_reader">Nosleep Reader</string>
     <string name="nav_header_title">NoSleep Reader</string>
     <string name="best_of">Best of</string>
     <string name="submitted_by">Submitted By:</string>
@@ -22,4 +22,12 @@
     <string name="title_activity_favorites">FavoritesActivity</string>
     <string name="context_favorites">Favorites</string>
     <string name="context_author">Find More From Author</string>
+    <string name="frontpage_title">Front Page</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="best_of_2010_title">Best Of 2010</string>
+    <string name="best_of_2011_title">Best Of 2011</string>
+    <string name="best_of_2012_title">Best of 2012</string>
+    <string name="best_of_2013_title">Best of 2013</string>
+    <string name="best_of_2014_title">Best of 2014</string>
+    <string name="best_of_2015_title">Best of 2015</string>
 </resources>

@@ -40,6 +40,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
+import com.projects.nosleepproject.events.FailedLoadEvent;
 import com.projects.nosleepproject.events.ListingLoadedEvent;
 import com.projects.nosleepproject.events.QueryListingEvent;
 
@@ -48,7 +49,7 @@ import java.util.List;
 import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,
-        AbsListView.OnScrollListener{
+        AbsListView.OnScrollListener {
 
     private ModelFragment mFrag;
     private ListView mListView;
@@ -78,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String CURRENT_AUTHOR_TAG = "current_author";
 
     public static final String LOADING_TOAST_TEXT = "Still Loading...";
+    public static final String FAILED_LOAD_TOAST = "Network Error: Failed to Load List";
+
 
     public ProgressBar loadingPanel;
 
@@ -110,22 +113,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerForContextMenu(mListView);
     }
 
-    public void onFirstRun(){
+    public void onFirstRun() {
         resetList();
+        getSupportActionBar().setTitle(R.string.frontpage_title);
         mCurrentTable = FRONTPAGE_TAG;
         mFrag.getFrontPage("", mValuesArray, 0);
     }
+
     public void setupDrawerContent(NavigationView nView) {
         nView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 int id = menuItem.getItemId();
-                if(mFrag.scrollLoading){
+                if (mFrag.scrollLoading) {
                     Toast.makeText(getBaseContext(), LOADING_TOAST_TEXT, Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 switch (id) {
                     case R.id.front_page:
+                        getSupportActionBar().setTitle(R.string.frontpage_title);
                         resetList();
                         mCurrentTable = FRONTPAGE_TAG;
                         mFrag.getFrontPage("", mValuesArray, 0);
@@ -133,12 +139,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.favorites:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.favorites_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_FAVORITES;
                         mFrag.getFavorites(mValuesArray);
                         mDrawer.closeDrawers();
                         break;
                     case R.id.nav_year_one:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2010_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_ONE;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_ONE, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_ONE);
@@ -146,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.nav_year_two:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2011_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_TWO;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_TWO, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_TWO);
@@ -154,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.nav_year_three:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2012_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_THREE;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_THREE, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_THREE);
@@ -161,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.nav_year_four:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2013_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_FOUR;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_FOUR, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_FOUR);
@@ -168,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.nav_year_five:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2014_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_FIVE;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_FIVE, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_FIVE);
@@ -175,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         break;
                     case R.id.nav_year_six:
                         resetList();
+                        getSupportActionBar().setTitle(R.string.best_of_2015_title);
                         mCurrentTable = ListingDbHelper.TABLE_NAME_YEAR_SIX;
                         mFrag.getListings(ListingDbHelper.UNIX_YEAR_SIX, "", mValuesArray, count,
                                 ListingDbHelper.TABLE_NAME_YEAR_SIX);
@@ -189,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void resetList() {
-        if(mValuesArray != null)
+        if (mValuesArray != null)
             mValuesArray.clear();
         mValuesArray = mFrag.getContentArray();
         mPosition = ListView.INVALID_POSITION;
@@ -199,11 +212,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         loadingPanel.setVisibility(View.VISIBLE);
     }
 
-    public void getCurrentList(){
+    public void getCurrentList() {
         String timestamp = null;
         String table = null;
-        switch(mCurrentTable){
-            case ListingDbHelper.TABLE_NAME_FAVORITES:;
+        switch (mCurrentTable) {
+            case ListingDbHelper.TABLE_NAME_FAVORITES:
+                ;
                 return;
             case CURRENT_AUTHOR_TAG:
                 mFrag.getAuthor(mAfter, mValuesArray, count, mAuthor);
@@ -237,9 +251,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         mFrag.getListings(timestamp, mAfter, mValuesArray, count, table);
     }
+
     @Override
     protected void onPause() {
-        if(firstRun != true){
+        if (firstRun != true) {
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putInt(LIST_POSITION_TAG, mPosition);
@@ -256,19 +271,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().registerSticky(this);
-        if(mPosition != ListView.INVALID_POSITION){
+        if (mPosition != ListView.INVALID_POSITION) {
 
             Log.e("onResume", Integer.toString(mPosition));
             mListView.setSelection(mPosition);
         }
-        if(firstRun != true){
+        if (firstRun != true) {
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
             mPosition = sharedPref.getInt(LIST_POSITION_TAG, mPosition);
             mCurrentTable = sharedPref.getString(CURRENT_TABLE_TAG, mCurrentTable);
             mAfter = sharedPref.getString(MAFTER_TAG, mAfter);
             count = sharedPref.getInt(COUNT_TAG, count);
-        }
-        else{
+        } else {
             onFirstRun();
         }
 
@@ -294,18 +308,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(QueryListingEvent event){
+    public void onEventMainThread(QueryListingEvent event) {
         mValuesArray = event.getValuesArray();
         mAdapter = new ListViewAdapter(this, mValuesArray);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
         Log.e("mPosition: ", Integer.toString(mPosition));
-        if(mPosition != ListView.INVALID_POSITION)
+        if (mPosition != ListView.INVALID_POSITION)
             mListView.setSelection(mPosition);
         loadingPanel.setVisibility(View.GONE);
         firstRun = false;
     }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(FailedLoadEvent event) {
+        Toast.makeText(this, FAILED_LOAD_TOAST, Toast.LENGTH_SHORT).show();
+        resetList();
+        mValuesArray = event.getValues();
+        mAdapter = new ListViewAdapter(this, mValuesArray);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
+        Log.e("mPosition: ", Integer.toString(mPosition));
+        if (mPosition != ListView.INVALID_POSITION)
+            mListView.setSelection(mPosition);
+        loadingPanel.setVisibility(View.GONE);
+        firstRun = false;
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -339,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         try {
-            if(mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL).equals("")){
+            if (mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL).equals("")) {
                 return;
             }
             String url = mValuesArray.get(i).getAsString(ListingDbHelper.COLUMN_URL);
@@ -362,12 +394,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         int lastInScreen = firstVisibleItem + visibleItemCount;
         if (lastInScreen == totalItemCount && !mFrag.scrollLoading && mAfter != null) {
-            if(mCurrentTable.equals(CURRENT_AUTHOR_TAG)){
+            if (mCurrentTable.equals(CURRENT_AUTHOR_TAG)) {
                 loadingPanel.setVisibility(View.VISIBLE);
                 count += 25;
                 getCurrentList();
-            }
-            else if(!mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
+            } else if (!mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
                 loadingPanel.setVisibility(View.VISIBLE);
                 count += 25;
                 getCurrentList();
@@ -382,20 +413,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         menu.setHeaderTitle(mValuesArray.get(info.position).getAsString(ListingDbHelper.COLUMN_TITLE));
         MenuItem favorites = menu.findItem(R.id.context_menu_favorite);
-        if(mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)){
+        if (mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
             favorites.setTitle("Remove from Favorites");
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if(mFrag.scrollLoading){
+        if (mFrag.scrollLoading) {
             Toast.makeText(this, LOADING_TOAST_TEXT, Toast.LENGTH_SHORT);
             return true;
         }
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int id = item.getItemId();
-        switch(id){
+        switch (id) {
             case R.id.copy_url:
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("label", mValuesArray.get(info.position)
@@ -403,12 +434,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 clipboard.setPrimaryClip(clip);
                 break;
             case R.id.context_menu_favorite:
-                if(mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)){
+                if (mCurrentTable.equals(ListingDbHelper.TABLE_NAME_FAVORITES)) {
                     mPosition = (info.position - 1 >= 0) ? info.position - 1 : 0;
                     mDbHelper.deleteFavoites(mValuesArray.get(info.position).getAsString(ListingDbHelper.COLUMN_ID));
                     mFrag.getFavorites(mValuesArray);
-                }
-                else
+                } else
                     mDbHelper.insertFavorites(mValuesArray.get(info.position));
                 break;
             case R.id.context_menu_author:
@@ -433,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onBackPressed() {
-        if(mDrawer.isDrawerOpen(GravityCompat.START)){
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawers();
             return;
         }

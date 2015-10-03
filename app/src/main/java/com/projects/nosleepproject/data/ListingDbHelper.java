@@ -250,7 +250,7 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_ID, "1");
                 values.put(COLUMN_AUTHOR, "");
-                values.put(COLUMN_TITLE, "Empty Favorites List");
+                values.put(COLUMN_TITLE, "Empty List");
                 values.put(COLUMN_SCORE, "");
                 values.put(COLUMN_URL, "");
                 valuesArray.add(values);
