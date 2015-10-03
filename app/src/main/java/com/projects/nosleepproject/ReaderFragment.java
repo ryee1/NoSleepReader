@@ -101,7 +101,6 @@ public class ReaderFragment extends Fragment{
                         textView.setText(Html.fromHtml(htmltext));
                         textView.setMovementMethod(LinkMovementMethod.getInstance());
                     } catch (Exception e) {
-                        Log.e("ReaderFragment: ", "onResponse failure");
                     }
                 }
 

@@ -20,7 +20,6 @@ package com.projects.nosleepproject;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
 import com.projects.nosleepproject.events.FailedLoadEvent;
@@ -111,7 +110,6 @@ public class ModelFragment extends Fragment {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.e("getListings error: ", after);
                 }
                 finally{
                     scrollLoading = false;
@@ -123,10 +121,8 @@ public class ModelFragment extends Fragment {
                 mDbHelper.queryTable(table, contentArray);
                 scrollLoading = false;
                 EventBus.getDefault().postSticky(new FailedLoadEvent(contentArray));
-                Log.e("getListings: ", "failed to get list");
             }
         });
-        Log.e("getListings:", table);
     }
 
     public synchronized void getFrontPage(String after, final List<ContentValues> contentArray, int count){
@@ -137,15 +133,10 @@ public class ModelFragment extends Fragment {
             public void onResponse(Response<ListingsModel> response) {
                 try {
                     String after = response.body().getData().getAfter();
-
-                    List<ListingsModel.Children> list = response.body().getData().getChildren();
-                    if (after != null) {
-                        ModelToContentvalue(response.body());
-                        EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
-                    }
+                    ModelToContentvalue(response.body());
+                    EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.e("getFrontpage:", "onResponse error");
                 } finally {
                     scrollLoading = false;
                 }
@@ -155,7 +146,6 @@ public class ModelFragment extends Fragment {
             public void onFailure(Throwable t) {
                 scrollLoading = false;
                 EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
-                Log.e("getFrontpage: ", "failed to get front page");
             }
         });
     }

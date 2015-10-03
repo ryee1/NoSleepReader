@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 public class ReaderActivity extends AppCompatActivity {
 
@@ -37,8 +36,6 @@ public class ReaderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reader);
         Intent intent = getIntent();
         if(intent.getData() != null){
-
-            Log.e("Reader url:", "" + intent.getData());
             url = intent.getData().toString();
         }
         else {

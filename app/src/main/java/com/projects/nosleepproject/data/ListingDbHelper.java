@@ -24,7 +24,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Process;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 import com.projects.nosleepproject.events.ListingLoadedEvent;
 import com.projects.nosleepproject.events.QueryListingEvent;
@@ -171,7 +170,6 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
 
     public void deleteFavoites(String id){
         SQLiteDatabase db = getWritableDatabase();
-        Log.e("deletefav", id);
         db.delete(TABLE_NAME_FAVORITES, COLUMN_ID + "=?", new String[] {id});
     }
     private class LoadListingEvent extends Thread{
@@ -210,7 +208,6 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
                 EventBus.getDefault().postSticky(new ListingLoadedEvent(valuesArray, after));
                 db.setTransactionSuccessful();
             } catch(Exception e){
-                Log.e("LoadListingEvent: ", "Error inserting DB");
                 e.printStackTrace();
             } finally{
                 db.endTransaction();
