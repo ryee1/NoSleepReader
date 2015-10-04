@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/reader_title"
-        android:textSize="25sp"
         android:paddingBottom="25dp"
         style="@style/nav_style"/>
     <TextView
@@ -20,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/reader_title"
         android:id="@+id/webView_fragment"
-        android:textSize="16sp"
         style="@style/nav_style"/>
 </RelativeLayout>
 </ScrollView>

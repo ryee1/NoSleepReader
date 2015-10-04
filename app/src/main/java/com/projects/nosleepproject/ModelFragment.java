@@ -136,6 +136,7 @@ public class ModelFragment extends Fragment {
                     ModelToContentvalue(response.body());
                     EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                 } catch (Exception e) {
+                    EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
                     e.printStackTrace();
                 } finally {
                     scrollLoading = false;

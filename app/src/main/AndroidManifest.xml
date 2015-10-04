@@ -20,19 +20,26 @@
         </activity>
         <activity
             android:name=".ReaderActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_reader" >
-            <intent-filter android:label="Nosleep Reader">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http"
+            <intent-filter android:label="Nosleep Reader" >
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
                     android:host="www.reddit.com"
-                    android:pathPrefix="/r/nosleep/comments"/>
-                <data android:scheme="https"
+                    android:pathPrefix="/r/nosleep/comments"
+                    android:scheme="http" />
+                <data
                     android:host="www.reddit.com"
-                    android:pathPrefix="/r/nosleep/comments"/>
+                    android:pathPrefix="/r/nosleep/comments"
+                    android:scheme="https" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".PreferenceActivity"
+            android:label="@string/title_activity_preference" >
         </activity>
     </application>
 

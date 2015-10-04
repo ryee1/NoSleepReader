@@ -20,20 +20,22 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.projects.nosleepproject.data.ListingDbHelper;
@@ -52,12 +54,36 @@ public class ReaderFragment extends Fragment{
     private ListingDbHelper mDbHelper;
     private ShareActionProvider mShareActionProvider;
     private ApiService service;
-    private WebView webView;
     private TextView textView;
     private TextView title;
     private String htmltext = null;
     private String url;
     private ContentValues values = null;
+    private int mfontSize;
+    private int mtitleSize;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getFontSizes();
+    }
+
+    private void getFontSizes(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String font = prefs.getString(getContext().getString(R.string.pref_font_size_key),
+                getContext().getString(R.string.pref_font_size_default));
+        mfontSize = Integer.parseInt(font);
+        if(mfontSize < 16)
+            mtitleSize = 20;
+        else if(mfontSize > 16)
+            mtitleSize = 28;
+        else
+            mtitleSize = 24;
+
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mfontSize);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, mtitleSize);
+
+    }
 
     public static ReaderFragment getInstance(String url){
         ReaderFragment f = new ReaderFragment();
@@ -79,7 +105,8 @@ public class ReaderFragment extends Fragment{
         mDbHelper = ListingDbHelper.getInstance(getContext());
         textView = (TextView) view.findViewById(R.id.webView_fragment);
         title = (TextView) view.findViewById(R.id.reader_title);
-            Bundle bundle = this.getArguments();
+
+        Bundle bundle = this.getArguments();
             String url = this.url = bundle.getString(ReaderActivity.READER_URL_KEY);
 
             String base_url = url.substring(0, url.length() - 1);
@@ -148,6 +175,9 @@ public class ReaderFragment extends Fragment{
             case R.id.reader_favorite:
                 mDbHelper.insertFavorites(values);
                 break;
+            case R.id.action_settings:
+                getActivity().startActivity(new Intent(getActivity(), PreferenceActivity.class));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

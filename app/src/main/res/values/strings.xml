@@ -1,4 +1,6 @@
 <resources>
+
+
     <string name="app_name">NoSleepProject</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -30,4 +32,9 @@
     <string name="best_of_2013_title">Best of 2013</string>
     <string name="best_of_2014_title">Best of 2014</string>
     <string name="best_of_2015_title">Best of 2015</string>
+    <string name="title_activity_preference">PreferenceActivity</string>
+    <string name="pref_font_size_title">Font Size</string>
+    <string name="pref_font_size">pref_font_size</string>
+    <string name="pref_font_size_default">16</string>
+    <string name="pref_font_size_key">pref_font_size_ke</string>
 </resources>

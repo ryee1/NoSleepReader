@@ -6,9 +6,6 @@
         <item
             android:id="@+id/favorites"
             android:title="@string/context_favorites"/>
-        <item
-            android:id="@+id/search_nosleep"
-            android:title="@string/search_nosleep"/>
     </group>
     <item android:title="@string/best_of">
         <menu>

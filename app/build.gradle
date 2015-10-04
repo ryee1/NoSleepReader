@@ -8,8 +8,8 @@ android {
         applicationId "com.projects.nosleepproject"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.0.2.1"
+        versionCode 7
+        versionName "1.0.4"
     }
     buildTypes {
         release {
