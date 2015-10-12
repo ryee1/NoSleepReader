@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.events;
+package com.projects.nosleepreader;
 
-import android.content.ContentValues;
-
-import java.util.List;
+import android.app.Application;
+import android.test.ApplicationTestCase;
 
 /**
- * Created by ry on 9/29/15.
+ * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public class FailedLoadEvent {
-    private List<ContentValues> values;
-
-    public FailedLoadEvent(List<ContentValues> values) {
-        this.values = values;
-    }
-
-    public List<ContentValues> getValues() {
-        return values;
+public class ApplicationTest extends ApplicationTestCase<Application> {
+    public ApplicationTest() {
+        super(Application.class);
     }
 }

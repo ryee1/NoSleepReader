@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
-
-import android.app.Application;
-import android.test.ApplicationTestCase;
+package com.projects.nosleepreader.events;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * Created by ry on 9/29/15.
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public class FailedLoadEvent {
+    private  String after;
+
+    public FailedLoadEvent(String after) {
+        this.after = after;
+    }
+
+    public String getAfter() {
+        return after;
     }
 }

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -38,9 +37,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.projects.nosleepproject.data.ListingDbHelper;
-import com.projects.nosleepproject.models.DetailModel;
-import com.projects.nosleepproject.services.ApiService;
+import com.projects.nosleepreader.data.ListingDbHelper;
+import com.projects.nosleepreader.models.DetailModel;
+import com.projects.nosleepreader.services.ApiService;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -61,6 +60,7 @@ public class ReaderFragment extends Fragment{
     private ContentValues values = null;
     private int mfontSize;
     private int mtitleSize;
+
 
     @Override
     public void onResume() {
@@ -167,10 +167,11 @@ public class ReaderFragment extends Fragment{
             return false;
         }
         switch (id) {
-            case R.id.reader_copy_url:
-                ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(getContext().CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("label", values.getAsString(ListingDbHelper.COLUMN_URL));
-                clipboard.setPrimaryClip(clip);
+            case R.id.open_url_in_browser:
+                String url = values.getAsString(ListingDbHelper.COLUMN_URL);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
                 break;
             case R.id.reader_favorite:
                 mDbHelper.insertFavorites(values);

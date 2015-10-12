@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.services;
+package com.projects.nosleepreader.services;
 
-import com.projects.nosleepproject.models.DetailModel;
-import com.projects.nosleepproject.models.ListingsModel;
+import com.projects.nosleepreader.models.DetailModel;
+import com.projects.nosleepreader.models.ListingsModel;
 
 import retrofit.Call;
 import retrofit.http.GET;

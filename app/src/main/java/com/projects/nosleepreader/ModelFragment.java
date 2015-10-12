@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
 
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.projects.nosleepproject.data.ListingDbHelper;
-import com.projects.nosleepproject.events.FailedLoadEvent;
-import com.projects.nosleepproject.events.ListingLoadedEvent;
-import com.projects.nosleepproject.models.ListingsModel;
-import com.projects.nosleepproject.services.ApiService;
+import com.projects.nosleepreader.data.ListingDbHelper;
+import com.projects.nosleepreader.events.FailedLoadEvent;
+import com.projects.nosleepreader.events.ListingLoadedEvent;
+import com.projects.nosleepreader.models.ListingsModel;
+import com.projects.nosleepreader.services.ApiService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class ModelFragment extends Fragment {
         searchService = retrofit.create(ApiService.class);
     }
 
-    public synchronized void getAuthor(String after, final List<ContentValues> contentArray,
+    public synchronized void getAuthor(final String after, final List<ContentValues> contentArray,
                                        int count, String author){
         scrollLoading = true;
         Call<ListingsModel> call = searchService.searchAuthor(searchService.RAW_JSON, searchService.RESTRICT_SR,
@@ -83,7 +83,7 @@ public class ModelFragment extends Fragment {
                     ModelToContentvalue(response.body());
                     EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                 }catch (Exception e){
-
+                    EventBus.getDefault().postSticky(new FailedLoadEvent(after));
                 }finally{
                     scrollLoading = false;
                 }
@@ -91,7 +91,7 @@ public class ModelFragment extends Fragment {
 
             @Override
             public void onFailure(Throwable t) {
-                EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
+                EventBus.getDefault().postSticky(new FailedLoadEvent(after));
             }
         });
     }
@@ -109,6 +109,8 @@ public class ModelFragment extends Fragment {
                     mDbHelper.loadTable(response.body(), contentArray, table);
 
                 } catch (Exception e) {
+
+                    EventBus.getDefault().postSticky(new FailedLoadEvent(after));
                     e.printStackTrace();
                 }
                 finally{
@@ -118,14 +120,13 @@ public class ModelFragment extends Fragment {
 
             @Override
             public void onFailure(Throwable t) {
-                mDbHelper.queryTable(table, contentArray);
                 scrollLoading = false;
-                EventBus.getDefault().postSticky(new FailedLoadEvent(contentArray));
+                EventBus.getDefault().postSticky(new FailedLoadEvent(after));
             }
         });
     }
 
-    public synchronized void getFrontPage(String after, final List<ContentValues> contentArray, int count){
+    public synchronized void getFrontPage(final String after, final List<ContentValues> contentArray, int count){
         scrollLoading = true;
         Call<ListingsModel> call = searchService.loadfrontPage(ApiService.RAW_JSON, ApiService.RESTRICT_SR, after, count);
         call.enqueue(new Callback<ListingsModel>() {
@@ -136,7 +137,7 @@ public class ModelFragment extends Fragment {
                     ModelToContentvalue(response.body());
                     EventBus.getDefault().postSticky(new ListingLoadedEvent(contentArray, after));
                 } catch (Exception e) {
-                    EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
+                    EventBus.getDefault().postSticky(new FailedLoadEvent(after));
                     e.printStackTrace();
                 } finally {
                     scrollLoading = false;
@@ -146,7 +147,7 @@ public class ModelFragment extends Fragment {
             @Override
             public void onFailure(Throwable t) {
                 scrollLoading = false;
-                EventBus.getDefault().postSticky(new FailedLoadEvent(new ArrayList<ContentValues>()));
+                EventBus.getDefault().postSticky(new FailedLoadEvent(after));
             }
         });
     }

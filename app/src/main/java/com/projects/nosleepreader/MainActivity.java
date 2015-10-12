@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -28,6 +28,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,10 +39,14 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.projects.nosleepproject.data.ListingDbHelper;
-import com.projects.nosleepproject.events.FailedLoadEvent;
-import com.projects.nosleepproject.events.ListingLoadedEvent;
-import com.projects.nosleepproject.events.QueryListingEvent;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.projects.nosleepreader.analytics.AnalyticsApplication;
+import com.projects.nosleepreader.data.ListingDbHelper;
+import com.projects.nosleepreader.events.FailedLoadEvent;
+import com.projects.nosleepreader.events.ListingLoadedEvent;
+import com.projects.nosleepreader.events.QueryListingEvent;
+import com.projects.nosleepreader.ratememaybe.RateMeMaybe;
 
 import java.util.List;
 
@@ -81,12 +86,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String LOADING_TOAST_TEXT = "Still Loading...";
     public static final String FAILED_LOAD_TOAST = "Network Error: Failed to Load List";
 
+    private static String TAG = MainActivity.class.getName();
+
 
     public ProgressBar loadingPanel;
+
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //User Rating prompt
+        RateMeMaybe rmm = new RateMeMaybe(this);
+        rmm.setPromptMinimums(10, 14, 10, 20);
+        rmm.setDialogMessage("You really seem to like this app, "
+                + "since you have already used it %totalLaunchCount% times! "
+                + "It would be great if you took a moment to rate it.");
+        rmm.setDialogTitle("Rate this app");
+        rmm.setPositiveBtn("Yeeha!");
+        rmm.run();
+
+        //Analytics
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
         mDbHelper = ListingDbHelper.getInstance(this);
         setContentView(R.layout.activity_main);
 
@@ -112,9 +136,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         registerForContextMenu(mListView);
 
-        if(savedInstanceState == null){
-            onFirstRun();
-        }
     }
 
     @Override
@@ -297,6 +318,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().registerSticky(this);
+
+        //Analytics
+        Log.i(TAG, "Setting screen name: " + mCurrentTable);
+        mTracker.setScreenName("Image~" + mCurrentTable);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
+
         if(mValuesArray == null)
             mValuesArray = mFrag.getContentArray();
 
@@ -334,6 +362,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mAdapter.notifyDataSetChanged();
             loadingPanel.setVisibility(View.GONE);
         }
+
+        //Analytics
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("ListingLoadedEvent")
+                .setLabel("" + mCurrentTable)
+                .build());
     }
 
     @SuppressWarnings("unused")
@@ -347,22 +381,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mListView.setSelection(mPosition);
         loadingPanel.setVisibility(View.GONE);
         firstRun = false;
+        //Analytics
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("QueryListingEvent")
+                .setLabel("" + mCurrentTable)
+                .build());
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(FailedLoadEvent event) {
-        Toast.makeText(this, FAILED_LOAD_TOAST, Toast.LENGTH_SHORT).show();
-        resetList();
-        mValuesArray = event.getValues();
-        mAdapter = new ListViewAdapter(this, mValuesArray);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnScrollListener(this);
-        if (mPosition != ListView.INVALID_POSITION)
-            mListView.setSelection(mPosition);
+        mAfter = event.getAfter();
         loadingPanel.setVisibility(View.GONE);
-        firstRun = false;
-
+        //Analytics
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("FailedLoadEvent")
+                .setLabel("" + mCurrentTable)
+                .build());
     }
 
     @Override

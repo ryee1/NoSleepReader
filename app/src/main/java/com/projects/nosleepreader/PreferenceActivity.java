@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
-
-import android.app.Fragment;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+import android.support.v7.app.AppCompatActivity;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class SettingsFragment extends PreferenceFragment {
-
-
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
+public class PreferenceActivity extends AppCompatActivity {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
+        getFragmentManager().beginTransaction()
+                .add(android.R.id.content, new SettingsFragment()).commit();
     }
+
 }

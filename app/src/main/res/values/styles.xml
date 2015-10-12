@@ -5,11 +5,11 @@
 
         <item name="android:textColorSecondary">@color/white</item>
         <item name="colorPrimary">@color/nosleep_dark</item>
-        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorPrimaryDark">@color/grey_900</item>
     </style>
 
     <style name="toolbarTheme" parent="AppTheme">
-        <item name="android:background">@color/black</item>
+        <item name="android:background">@color/grey_900</item>
     </style>
     <style name="nav_style" parent ="AppTheme">
 

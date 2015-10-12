@@ -1,24 +1,26 @@
 <resources>
 
 
-    <string name="app_name">NoSleepProject</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">NoSleep Reader</string>
     <string name="action_settings">Settings</string>
-    <string name="title">Nosleep Reader</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_reader">Nosleep Reader</string>
+    <string name="title">NoSleep Reader</string>
+    <string name="title_activity_reader">NoSleep Reader</string>
     <string name="nav_header_title">NoSleep Reader</string>
     <string name="best_of">Best of</string>
     <string name="submitted_by">Submitted By:</string>
     <string name="search_nosleep">Search NoSleep</string>
     <string name="front_page">Front Page</string>
+
+
     <string name="menu_2010">2010</string>
     <string name="menu_2011">2011</string>
     <string name="menu_2012">2012</string>
     <string name="menu_2013">2013</string>
     <string name="menu_2014">2014</string>
     <string name="menu_2015">2015</string>
-    <string name="add_to_favorite">Add To Favorite</string>
+
+
+    <string name="add_to_favorite">Add To Favorites</string>
     <string name="share">Share</string>
     <string name="context_url_to_clipboard">Copy URL to Clipboard</string>
     <string name="title_activity_favorites">FavoritesActivity</string>
@@ -26,15 +28,22 @@
     <string name="context_author">Find More From Author</string>
     <string name="frontpage_title">Front Page</string>
     <string name="favorites_title">Favorites</string>
+
     <string name="best_of_2010_title">Best Of 2010</string>
     <string name="best_of_2011_title">Best Of 2011</string>
     <string name="best_of_2012_title">Best of 2012</string>
     <string name="best_of_2013_title">Best of 2013</string>
     <string name="best_of_2014_title">Best of 2014</string>
     <string name="best_of_2015_title">Best of 2015</string>
+
+
     <string name="title_activity_preference">PreferenceActivity</string>
     <string name="pref_font_size_title">Font Size</string>
     <string name="pref_font_size">pref_font_size</string>
     <string name="pref_font_size_default">16</string>
     <string name="pref_font_size_key">pref_font_size_ke</string>
+    <string name="menu_reader_open_url_in_browser">Open Url in Browser</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

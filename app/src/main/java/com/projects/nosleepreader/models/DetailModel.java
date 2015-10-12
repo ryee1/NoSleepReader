@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.models;
+package com.projects.nosleepreader.models;
 
 import java.util.List;
 

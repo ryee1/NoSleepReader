@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.events;
+package com.projects.nosleepreader;
 
-import android.content.ContentValues;
 
-import java.util.List;
+import android.app.Fragment;
+import android.os.Bundle;
+import android.preference.PreferenceFragment;
 
 /**
- * Created by ry on 9/19/15.
+ * A simple {@link Fragment} subclass.
  */
-public class QueryListingEvent {
+public class SettingsFragment extends PreferenceFragment {
 
-    private List<ContentValues> valuesArray;
 
-    public QueryListingEvent(List<ContentValues> valuesArray){
-        this.valuesArray = valuesArray;
-
+    public SettingsFragment() {
+        // Required empty public constructor
     }
 
-    public List<ContentValues> getValuesArray() {
-        return valuesArray;
-    }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
+    }
 }

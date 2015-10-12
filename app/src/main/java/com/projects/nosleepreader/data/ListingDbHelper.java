@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject.data;
+package com.projects.nosleepreader.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,9 +25,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Process;
 import android.provider.BaseColumns;
 
-import com.projects.nosleepproject.events.ListingLoadedEvent;
-import com.projects.nosleepproject.events.QueryListingEvent;
-import com.projects.nosleepproject.models.ListingsModel;
+import com.projects.nosleepreader.events.ListingLoadedEvent;
+import com.projects.nosleepreader.events.QueryListingEvent;
+import com.projects.nosleepreader.models.ListingsModel;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import de.greenrobot.event.EventBus;
  */
 public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
 
-    private static int DATABASE_VERSION = 1;
+    private static int DATABASE_VERSION = 5;
     static String DATABASE_NAME = "listing.db";
 
     public static final String TABLE_NAME_YEAR_ONE = "year_2010";
@@ -54,6 +54,7 @@ public class ListingDbHelper extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_URL = "url";
+    public static final String COLUMN_FAVORITES = "favorites";
 
     public static final String UNIX_YEAR_ONE = "timestamp:1262304000..1293839999";
     public static final String UNIX_YEAR_TWO = "timestamp:1293840000..1325375999";

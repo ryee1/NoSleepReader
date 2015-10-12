@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader.analytics;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Application;
 
-public class PreferenceActivity extends AppCompatActivity {
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+import com.projects.nosleepreader.R;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction()
-                .add(android.R.id.content, new SettingsFragment()).commit();
+public class AnalyticsApplication extends Application {
+    private Tracker mTracker;
+
+    synchronized public Tracker getDefaultTracker() {
+        if (mTracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            mTracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return mTracker;
     }
 
 }

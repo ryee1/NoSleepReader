@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.projects.nosleepproject.data.ListingDbHelper;
+import com.projects.nosleepreader.data.ListingDbHelper;
 
 import java.util.List;
 

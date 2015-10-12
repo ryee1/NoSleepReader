@@ -14,24 +14,36 @@
  * limitations under the License.
  */
 
-package com.projects.nosleepproject;
+package com.projects.nosleepreader;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.projects.nosleepreader.analytics.AnalyticsApplication;
 
 public class ReaderActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private ShareActionProvider mShareActionProvider;
     private String url;
+    private static String TAG = ReaderActivity.class.getName();
 
     public static String READER_URL_KEY = "url_key";
+
+    private Tracker mTracker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Analytics
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         setContentView(R.layout.activity_reader);
         Intent intent = getIntent();
@@ -50,4 +62,12 @@ public class ReaderActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Analytics
+        Log.i(TAG, "Setting screen name: " + url);
+        mTracker.setScreenName("Image~" + url);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 }

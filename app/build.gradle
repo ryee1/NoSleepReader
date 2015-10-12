@@ -1,15 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.0"
 
     defaultConfig {
-        applicationId "com.projects.nosleepproject"
+        applicationId "com.projects.nosleepreader"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.0.4"
+        versionCode 10
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -27,4 +28,5 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
     compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'com.google.android.gms:play-services-analytics:8.1.0'
 }
